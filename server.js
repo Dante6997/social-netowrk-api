@@ -1,19 +1,27 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { required } = require('nodemon/lib/config');
+const connectDB = require('./config/connection');
+const routes = require('./routes');
+require('dotenv').config();
 
+const PORT = 3001;
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(routes);
 
 
+const start = async() =>{
+  try{
+    await connectDB(process.env.MONGO_URI)
+        app.listen(PORT, ()=>{
+            console.log(`Listening at port ${PORT}`)
+        })
+    }
+    catch(error){
+        console.log(error)
+    }
+}
 
-
-
-// Use this to log mongo queries being executed!
-mongoose.set('debug', true);
-
-app.use(require('./routes'));
-
-app.listen(PORT, () => console.log(`🌍 Connected on localhost:${PORT}`));
+start()
